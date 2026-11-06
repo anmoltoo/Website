@@ -1,0 +1,674 @@
+<!doctype html>
+<!-- Built with tasteskill 2.5 (assets/starter.html). Plan line 1: software. -->
+<html lang="en" data-type="software" data-radius="sharp" data-ground="sage" data-buttons="pill" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wyrex: Roblox executor and external for PC</title>
+<meta name="description" content="Wyrex runs Luau scripts inside Roblox with a tabbed editor and console, and Wyrex External reads the game from outside the client. Free on Windows 10 and 11.">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400..700&family=Chivo+Mono:wght@400..500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<style>
+:root {
+  --p-bg: #dedad3; --p-surface: #d3cec6; --p-ink: #0a0a0a; --p-muted: #55514c;
+  --p-accent: #256f82; --p-accent-ink: #ffffff; --p-action: #256f82; --p-action-ink: #ffffff;
+  --p-inv-bg: #0a0a0a; --p-inv-surface: #151515; --p-inv-ink: #dedad3; --p-inv-muted: #84827e;
+  --p-inv-accent: #256f82; --p-inv-accent-ink: #ffffff; --p-inv-action: #256f82; --p-inv-action-ink: #ffffff;
+  --font-display: "Chivo", system-ui, sans-serif;
+  --font-text: "Chivo", system-ui, sans-serif;
+  --font-mono: "Chivo Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 400;
+  --display-tracking: -0.03em;
+  --display-tracking-xl: -0.04em;
+  --ly-scale: 0.96;
+}
+</style>
+<link rel="stylesheet" href="assets/ui/base.css">
+<link rel="stylesheet" href="assets/ui/window/fragment.css">
+<link rel="stylesheet" href="assets/ui/code/fragment.css">
+<link rel="stylesheet" href="assets/ui/toggles/fragment.css">
+<link rel="stylesheet" href="assets/ui/search/fragment.css">
+<link rel="stylesheet" href="assets/ui/notify/fragment.css">
+<link rel="stylesheet" href="assets/ui/terminal-run/fragment.css">
+<script src="assets/backgrounds/backgrounds.js"></script>
+<!-- page CSS: only what sits inside a visual, the wireframe drawing of the UI the brief asks for, and one --p-h per card group -->
+<style>
+  html[data-buttons="pill"] .btn--secondary, html[data-buttons="pill"] .btn--secondary:hover { border-color: color-mix(in oklab, var(--ink) 70%, transparent); }
+  @media (max-width: 639px) { .hero--centred .pill .muted { display: none; } }
+  .skip { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .skip:focus { width: auto; height: auto; clip-path: none; z-index: 20; padding: var(--s-2) var(--s-3); background: var(--bg); outline: 2px solid var(--action); }
+  /* the wireframe look: every window and fragment drawn in hairlines of the ink, no shadow, small square corners */
+  .ui { --ui-radius: 4px; --ui-mono: var(--font-mono); --u-shadow: none; --u-shadow-sm: none;
+        --u-border: color-mix(in oklab, var(--u-ink) 42%, transparent); --u-line: color-mix(in oklab, var(--u-ink) 16%, transparent); }
+
+  /* hero: the Wyrex window, drawn as a wireframe over the lit frame */
+  .wx-win { --wl: color-mix(in oklab, var(--p-ink) 18%, transparent); --wl-2: color-mix(in oklab, var(--p-ink) 55%, transparent);
+            background: #f1efea; color: var(--p-ink); border: 1px solid var(--wl-2); border-radius: 4px; overflow: visible; font: 400 13px/1.45 var(--font-text); text-align: left; }
+  .wx-win__bar { display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px; border-bottom: 1px solid var(--wl); }
+  .wx-dots { display: flex; gap: 6px; } .wx-dots i { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--wl-2); }
+  .wx-win__bar b { font-weight: 500; }
+  .wx-logo { width: 16px; height: 16px; fill: none; stroke: var(--p-accent); stroke-width: 1.2; flex: none; } .wx-win__bar .sp { flex: 1; }
+  .wx-win__bar .wx-dim { color: #55514c; }
+  .wx-seg { display: inline-flex; border: 1px solid var(--wl-2); border-radius: 4px; overflow: hidden; }
+  .wx-seg span { padding: 3px 10px; } .wx-seg span + span { border-left: 1px solid var(--wl-2); }
+  .wx-seg .is-on { background: var(--p-ink); color: #f1efea; }
+  .wx-win__body { display: grid; grid-template-columns: 196px minmax(0, 1fr); min-height: 400px; }
+  .wx-files { border-right: 1px solid var(--wl); padding: 10px; display: grid; align-content: start; gap: 2px; }
+  .wx-files .q { height: 30px; margin-bottom: 6px; border: 1px dashed var(--wl-2); border-radius: 4px; display: flex; align-items: center; padding: 0 10px; color: #55514c; }
+  .wx-files span:not(.q) { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 8px; border-radius: 4px; font-family: var(--font-mono); }
+  .wx-files span:not(.q)::before { content: ""; width: 10px; height: 12px; border: 1px solid var(--wl-2); border-radius: 1px; flex: none; }
+  .wx-files .is-on { box-shadow: inset 0 0 0 1px var(--p-ink); }
+  .wx-main { display: grid; grid-template-rows: auto auto auto 1fr; min-width: 0; }
+  .wx-tabs { display: flex; height: 34px; border-bottom: 1px solid var(--wl); font-family: var(--font-mono); }
+  .wx-tabs > span { display: flex; align-items: center; padding: 0 14px; border-right: 1px solid var(--wl); color: #55514c; }
+  .wx-tabs > .is-on { color: var(--p-ink); box-shadow: inset 0 -2px 0 var(--p-ink); }
+  .wx-tabs .sp { flex: 1; border: 0; padding: 0; }
+  .wx-work { display: grid; grid-template-columns: minmax(0, 1fr) 270px; border-bottom: 1px solid var(--wl); }
+  .wx-code { margin: 0; padding: 10px 0; font: 13px/19px var(--font-mono); white-space: pre; overflow: hidden; }
+  .wx-code span[data-n]::before { content: attr(data-n); display: inline-block; width: 34px; padding-right: 12px; text-align: right; color: #8a857e; }
+  .wx-code .k { color: var(--p-accent); } .wx-code .s { color: #6b4a1f; }
+  .wx-con { border-left: 1px solid var(--wl); padding: 10px 12px; font: 13px/19px var(--font-mono); display: grid; align-content: start; gap: 2px; min-width: 0; }
+  .wx-con div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wx-con time { color: #8a857e; margin-right: 8px; }
+  .wx-con .ok { color: var(--p-accent); }
+  .wx-acts { display: flex; align-items: center; gap: 8px; padding: 0 10px; font-family: var(--font-text); }
+  .wx-acts > span:not(.wx-sel), .wx-sel > span { height: 24px; padding: 0 12px; color: var(--p-ink); display: inline-flex; align-items: center; border: 1px solid var(--wl-2); border-radius: 4px; font-weight: 500; }
+  .wx-acts .wx-run { background: var(--p-ink); color: #f1efea; border-color: var(--p-ink); }
+  /* the selection box a wireframe tool draws round the element in focus */
+  .wx-sel { position: relative; display: inline-flex; }
+  .wx-sel::before { content: ""; position: absolute; inset: -5px; border: 1px solid var(--p-accent); pointer-events: none; }
+  .wx-sel i { position: absolute; width: 7px; height: 7px; background: #f1efea; border: 1px solid var(--p-accent); }
+  .wx-sel i:nth-child(1) { left: -8px; top: -8px; } .wx-sel i:nth-child(2) { right: -8px; top: -8px; }
+  .wx-sel i:nth-child(3) { left: -8px; bottom: -8px; } .wx-sel i:nth-child(4) { right: -8px; bottom: -8px; }
+  .wx-sel > span { position: relative; }
+  @media (max-width: 1279px) { .wx-win__body { grid-template-columns: minmax(0, 1fr); } .wx-files { display: none; } }
+  @media (max-width: 1023px) { .wx-work { grid-template-columns: minmax(0, 1fr); } .wx-con { display: none; } .wx-acts > span:nth-child(n+3) { display: none; } }
+  @media (max-width: 639px) {
+    .wx-win__body { grid-template-columns: minmax(0, 1fr); } .wx-files { display: none; }
+    .wx-win__bar .wx-dim, .wx-seg { display: none; }
+    .wx-tabs > span:nth-child(2) { display: none; }
+    .wx-code span[data-n]::before { width: 26px; padding-right: 8px; }
+  }
+
+  /* app-frame (sections-library.md): the list beside the open item in one window */
+  .app.ui { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); margin-top: var(--s-7); background: var(--u-bg); border: 1px solid var(--u-border); border-radius: var(--u-r); box-shadow: var(--u-shadow); }
+  .app > .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+  .app > .app__pane + .app__pane { border-left: 1px solid var(--u-line); }
+  .app > .app__pane > .ui-panel { width: 100%; border: 0; border-radius: 0; box-shadow: none; }
+  .app > .app__pane::after { content: ""; position: absolute; inset: auto 0 0 0; height: 64px; background: linear-gradient(transparent, var(--u-bg)); pointer-events: none; }
+  @media (min-width: 1024px) and (max-width: 1279px) { .app.ui { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); } }
+  @media (max-width: 1023px) {
+    .app.ui { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .app > .app__pane--list { max-height: 252px; }
+    .app > .app__pane--list::after { display: none; }
+    .app .ui-win__side { display: none; }
+    .app .ui-win__body { grid-template-columns: minmax(0, 1fr); }
+    .app > .app__pane + .app__pane { border-left: 0; border-top: 1px solid var(--u-line); }
+  }
+  @media (max-width: 639px) {
+    .app.ui { grid-template-rows: minmax(0, 1fr); }
+    .app > .app__pane--list { display: none; }
+    .app > .app__pane + .app__pane { border-top: 0; }
+  }
+  /* the open script: its note stands under the tabs, so the line the loop marks is named above the fold */
+  #editor .ui-code { display: flex; flex-direction: column; }
+  #editor .ui-code__hint { order: -1; border-top: 0; border-bottom: 1px solid var(--u-line); }
+  #editor .ui-code__tabs { order: -2; }
+  #editor .ui-code__hint { color: var(--u-ink); }
+  @media (max-width: 639px) { #editor .ui-code__ln { white-space: pre-wrap; overflow-wrap: anywhere; } }
+
+  /* the feature 2x2: one panel height for the group */
+  #features .panel { --p-h: 336px; }
+  @media (max-width: 639px) { #features .panel { --p-h: 140px; } }
+  @media (min-width: 1024px) and (max-width: 1279px) { #features .panel { --p-h: 296px; } }
+
+  /* Wyrex External: the overlay over a game, drawn in lines */
+  #external .frame > .wx-scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .wx-scene .g { stroke: color-mix(in oklab, var(--p-inv-ink) 22%, transparent); stroke-width: 1; fill: none; }
+  .wx-scene .b { stroke: color-mix(in oklab, var(--p-inv-ink) 46%, transparent); stroke-width: 1; fill: none; }
+  .wx-scene .esp { stroke: var(--p-inv-ink); stroke-width: 1.5; fill: none; }
+  .wx-scene .esp--on { stroke: #4fb3c9; }
+  .wx-scene .hp { fill: var(--p-inv-ink); } .wx-scene .hp--on { fill: #4fb3c9; }
+  .wx-scene text { font: 500 13px/1 var(--font-mono); fill: var(--p-inv-ink); }
+  .wx-scene .t--on { fill: #4fb3c9; }
+  @media (max-width: 1023px) { #external .wx-scene text { font-size: 22px; } }
+  #external .frame > .wx-hud { position: absolute; z-index: 1; left: 24px; top: 24px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid color-mix(in oklab, var(--p-inv-ink) 40%, transparent); border-radius: 4px; background: #0a0a0a; color: var(--p-inv-ink); font: 13px/1 var(--font-mono); }
+  .wx-hud i { width: 7px; height: 7px; border-radius: 50%; background: #4fb3c9; }
+  @media (min-width: 640px) and (max-width: 1023px) { #external .frame--split { --ratio: 62%; } }
+  @media (max-width: 639px) { #external .frame--split { --ratio: 70%; } }
+  @media (min-width: 1024px) { #external .frame--split { --ratio: 108%; } }
+  #external .frame--split { background: #0f0f0f; border: 1px solid color-mix(in oklab, var(--p-inv-ink) 20%, transparent); }
+  .wx-reg { position: absolute; z-index: 2; inset: 12px; pointer-events: none; --c: color-mix(in oklab, currentColor 55%, transparent);
+            background:
+              linear-gradient(var(--c), var(--c)) 6px 0 / 1px 13px no-repeat, linear-gradient(var(--c), var(--c)) 0 6px / 13px 1px no-repeat,
+              linear-gradient(var(--c), var(--c)) calc(100% - 6px) 0 / 1px 13px no-repeat, linear-gradient(var(--c), var(--c)) 100% 6px / 13px 1px no-repeat,
+              linear-gradient(var(--c), var(--c)) 6px 100% / 1px 13px no-repeat, linear-gradient(var(--c), var(--c)) 0 calc(100% - 6px) / 13px 1px no-repeat,
+              linear-gradient(var(--c), var(--c)) calc(100% - 6px) 100% / 1px 13px no-repeat, linear-gradient(var(--c), var(--c)) 100% calc(100% - 6px) / 13px 1px no-repeat; }
+  .hero__window > .wx-reg { color: var(--p-ink); bottom: auto; height: 120px; }
+  #external .frame > .wx-reg { position: absolute; color: var(--p-inv-ink); }
+  #external .frame > .wx-hud { left: 40px; top: 40px; }
+  /* pricing: each plan shows the screen it gets, a small Wyrex window drawn in lines */
+  .wx-mini { --wl: color-mix(in oklab, var(--p-ink) 18%, transparent); --wl-2: color-mix(in oklab, var(--p-ink) 55%, transparent); border: 1px solid color-mix(in oklab, var(--ink) 42%, transparent); border-radius: 4px; background: #efece6; font: 13px/1.4 var(--font-mono); color: var(--p-ink); overflow: hidden; }
+  .wx-mini__bar { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-bottom: 1px solid color-mix(in oklab, var(--ink) 16%, transparent); font-family: var(--font-text); }
+  .wx-mini__bar .wx-dots i { width: 8px; height: 8px; }
+  .wx-mini__body { display: grid; gap: 8px; padding: 12px 10px; }
+  .wx-mini__row { display: flex; justify-content: space-between; gap: 12px; }
+  .wx-mini__row span:first-child { color: #55514c; }
+  .wx-mini__field { height: 30px; display: flex; align-items: center; padding: 0 8px; border: 1px dashed color-mix(in oklab, var(--ink) 50%, transparent); border-radius: 3px; }
+  .wx-mini__on { color: var(--p-accent); }
+  .wx-mini__acts { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; font-family: var(--font-text); }
+  .wx-mini__acts span { height: 26px; padding: 0 10px; display: inline-flex; align-items: center; border: 1px solid color-mix(in oklab, var(--ink) 50%, transparent); border-radius: 3px; font-weight: 500; }
+  .wx-mini__acts span:first-child { background: var(--p-ink); color: #efece6; border-color: var(--p-ink); }
+  /* the FAQ: two groups for the phone's two screens (.g2m); from 640 one grid, the head and the status beside the answers */
+  #faq .faq-status { max-width: 420px; }
+  #faq .faq-1, #faq .faq-2 { margin-top: var(--s-6); }
+  @media (min-width: 640px) {
+    #faq > .wrap { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gutter); grid-template-rows: auto 1fr; align-content: start; }
+    #faq .faq-a, #faq .faq-b { display: contents; }
+    #faq .faq-1, #faq .faq-2 { margin-top: 0; }
+    #faq .faq-2 > .faq__item:first-child { padding-top: var(--s-5); }
+    #faq .faq-head, #faq .faq-status { align-self: start; }
+  }
+  @media (min-width: 1024px) {
+    #faq .faq-head { grid-column: 1 / span 6; grid-row: 1; }
+    #faq .faq-status { grid-column: 1 / span 6; grid-row: 1 / span 2; margin-top: 196px; }
+    #faq .faq-1 { grid-column: 7 / -1; grid-row: 1; }
+    #faq .faq-2 { grid-column: 7 / -1; grid-row: 2; align-self: start; }
+  }
+  @media (min-width: 640px) and (max-width: 1023px) {
+    #faq > .wrap { grid-template-rows: auto auto 1fr; }
+    #faq .faq-head { grid-column: 1 / span 6; grid-row: 1; }
+    #faq .faq-status { grid-column: 7 / -1; grid-row: 1; width: 100%; }
+    #faq .faq-1 { grid-column: 1 / -1; grid-row: 2; margin-top: var(--s-5); }
+    #faq .faq-2 { grid-column: 1 / -1; grid-row: 3; align-self: start; }
+  }
+  html:not([data-motion="off"]) #pricing .card--plan { transition: transform var(--m-out) var(--m-ease), box-shadow var(--m-out) var(--m-ease); }
+  @media (hover: hover) and (pointer: fine) {
+    html:not([data-motion="off"]) #pricing .card--plan:hover { transform: translateY(var(--m-lift)); box-shadow: 0 14px 32px -18px rgb(0 0 0 / .35); transition-duration: 180ms; }
+  }
+  /* under 1024 the plans run to the foot of their screens, like every other section */
+  #pricing .card--plan > .wx-mini { margin-top: auto; }
+  @media (max-width: 639px) { #pricing > .wrap > .grid { flex: 1 1 auto; grid-template-rows: auto auto 1fr; } }
+  @media (max-width: 1279px) { #pricing > .wrap > .grid.fill { flex: 1 0 auto; } }
+  @media (min-width: 640px) and (max-width: 1023px) {
+    #pricing > .wrap > .grid { grid-template-rows: auto 1fr; }
+    #pricing .card--plan { grid-column: auto / span 6; grid-row: 2; }
+    #pricing .card--plan .wx-mini__acts { display: none; }
+  }
+  /* tablet: each screen's card row of the 2x2 runs down to that screen's foot, as from 1024 */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    #features > .wrap > .grid:last-child, #features > .wrap > .group > .grid:last-child { align-self: stretch; flex: 1 1 auto; min-height: 0; }
+  }
+  .facts { display: grid; gap: var(--s-3); margin: var(--s-5) 0 0; padding: 0; list-style: none; }
+  .facts li { padding-top: var(--s-3); border-top: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<!-- type: software (page type software, site-kind software). Wyrex: a Roblox script executor (Luau, runs inside the client)
+     and Wyrex External (a separate process that reads the game and draws an overlay). Main action: Download for Windows.
+     deal: hero centred, nav nav-mega, close close-word, footer footer-dark, rhythm dark-band, buttons pill, mark arc,
+           palette putty-black-teal, type chivo (Chivo + Chivo Mono), radius sharp (a developer tool), lit ground sage,
+           grounds: bg-ruled on the hero (taken by the brief's wireframe theme in place of the dealt bg-topglow; ruled lists
+           hero-centred), the External section on .ground-inverse (dark-band), the rest plain,
+           effect silk-folds in the hero frame, card grounds fluted-glass (the 2x2's panels, held still),
+           moments: line-carries-colour was dealt for #external and taken out: consistency.mjs failed its reveal
+           (scroll-reveal) and its cover at 768 and 820 (flush). No moment, no scene.
+     screens: hero 1 · editor (app-frame) 1 · features (features-2x2) 2 · external (split-text-left, dark band, the moment) 1
+              · pricing (pricing-two) 1 · faq 1 · footer.closing 1 -->
+
+<header class="nav">
+  <div class="wrap nav__bar">
+    <a class="skip" href="#editor">Skip to content</a>
+    <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>Wyrex</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item">
+        <a class="nav__link" href="#features">Executor <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="nav__menu">
+          <div class="wrap grid">
+            <div class="menu-col span-3">
+              <p class="t-label">Write scripts</p>
+              <a href="#editor">Editor<span>Tabs and Luau highlighting</span></a>
+              <a href="#hub">Script hub<span>Search scripts by name</span></a>
+            </div>
+            <div class="menu-col span-3">
+              <p class="t-label">Run them</p>
+              <a href="#auto-run">Auto-run<span>Runs scripts when you join</span></a>
+              <a href="#multi">Multi-instance<span>Several Roblox windows</span></a>
+              <a href="#console">Console<span>Errors with line numbers</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav__item"><a class="nav__link" href="#external">External</a></div>
+      <div class="nav__item"><a class="nav__link" href="#pricing">Pricing</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn--primary" href="#pricing">Download for Windows</a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero hero--centred bg-ruled" aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c">
+        <a class="pill" href="#external"><span>Wyrex External is in the same download</span><span class="muted">See the overlay</span></a>
+        <h1 id="hero-h" aria-label="Roblox executor and external for PC"><span class="ly-mark" aria-hidden="true"></span> Roblox executor and external for PC</h1>
+        <p class="hero__lead">Wyrex runs Luau scripts inside Roblox from a tabbed editor with a console. Wyrex External reads the game from outside the client. Free on Windows 10 and 11.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="#pricing">Download for Windows<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="#pricing">See pricing</a></div>
+      </div>
+      <div class="hero__window" data-fx="silk-folds" data-fx-seed="11" role="img" aria-label="The Wyrex window attached to Roblox: a Luau script that lists the players in the server, the Execute button, and the console printing each name">
+        <i class="wx-reg" aria-hidden="true"></i>
+        <div class="ly-piece wx-win ui" aria-hidden="true">
+          <div class="wx-win__bar"><span class="wx-dots"><i></i><i></i><i></i></span><svg class="wx-logo" viewBox="0 0 16 16"><path d="M3 13V8a5 5 0 0 1 10 0v5h-3V8a2 2 0 0 0-4 0v5z"/></svg><span><b>Wyrex</b> <span class="wx-dim">· attached to Roblox · PID 14820</span></span><span class="sp"></span><span class="wx-seg"><span class="is-on">Executor</span><span>External</span></span></div>
+          <div class="wx-win__body">
+            <div class="wx-files">
+              <div class="q">Search scripts</div>
+              <span class="is-on">players.luau</span>
+              <span>rejoin.luau</span>
+              <span>fps-unlock.luau</span>
+              <span>waypoints.luau</span>
+              <span>chat-log.luau</span>
+              <span>auto-run/</span>
+            </div>
+            <div class="wx-main">
+              <div class="wx-tabs"><span class="is-on">players.luau</span><span>rejoin.luau</span><span>+</span><span class="sp"></span><div class="wx-acts"><span class="wx-sel"><i></i><i></i><i></i><i></i><span class="wx-run">Execute</span></span><span>Clear</span><span>Open file</span></div></div>
+              <div class="wx-work">
+<pre class="wx-code"><span data-n="1"><span class="k">local</span> P = game.Players</span>
+<span data-n="2"><span class="k">local</span> list = P:GetPlayers()</span>
+<span data-n="3"> </span>
+<span data-n="4"><span class="k">for</span> _, p <span class="k">in</span> list <span class="k">do</span></span>
+<span data-n="5">  print(p.Name, p.AccountAge)</span>
+<span data-n="6"><span class="k">end</span></span>
+<span data-n="7">print(<span class="s">"In server:"</span>, #list)</span></pre>
+                <div class="wx-con" data-ly-steps="900">
+                  <div><time>14:02</time>Attached, PID 14820</div>
+                  <div data-step><time>14:02</time><span class="ok">Ran players.luau, 3 ms</span></div>
+                  <div data-step><time>14:02</time>kestrel_09  412</div>
+                  <div data-step><time>14:02</time>mintfox  88</div>
+                  <div data-step><time>14:02</time>In server: 12</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="section" id="editor" aria-labelledby="editor-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 class="span-6" id="editor-h">Scripts, tabs and console in one window</h2>
+        <div class="span-6 start-7 stack-4">
+          <p>Pick a script from your library, edit it with Luau highlighting and press Execute. Output and errors print in the console with the line they came from.</p>
+          <a class="link" href="#console">See the console</a>
+        </div>
+      </div>
+      <div class="ui app fill" role="img" aria-label="The Wyrex script library beside the open script, players.luau, with a note on the marked line" data-ui-pause-host>
+        <div class="app__pane app__pane--list">
+          <div class="ui ui-panel ui-win" data-ui="window" data-open="Saved" data-work="Running" data-done="Ran">
+            <div class="ui-win__bar">
+              <span class="ui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="ui-win__crumb">Wyrex <i>/</i> <b>Library</b></span>
+              <span class="ui-spacer"></span>
+              <span class="ui-win__search" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg><span class="ui-win__ph">Search</span><span class="ui-kbd">/</span></span>
+            </div>
+            <div class="ui-win__body">
+              <nav class="ui-win__side" aria-hidden="true">
+                <span class="ui-win__nav is-on"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M4 2.5h5l3 3v8H4z"/><path d="M9 2.5v3h3"/></svg>Saved<em>14</em></span>
+                <span class="ui-win__nav"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M4 3.5v9l8-4.5z"/></svg>Auto-run<em>3</em></span>
+                <span class="ui-win__nav"><svg class="ui-icon" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>Hub</span>
+                <span class="ui-win__nav"><svg class="ui-icon" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>Recent</span>
+                <span class="ui-win__label">Folders</span>
+                <span class="ui-win__nav"><span class="ui-win__hash">#</span>Tools</span>
+                <span class="ui-win__nav"><span class="ui-win__hash">#</span>Servers</span>
+              </nav>
+              <div class="ui-win__main">
+                <div class="ui-win__cols" aria-hidden="true"><span>File</span><span>What it does</span><span>Status</span><span>Edited</span></div>
+                <ul class="ui-win__rows">
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="1">PL</span><span class="ui-win__who">players.luau</span><span class="ui-win__sub">Lists players · 7 lines</span><span class="ui-win__st" data-st>Saved</span><span class="ui-win__age">2m</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="3">RJ</span><span class="ui-win__who">rejoin.luau</span><span class="ui-win__sub">Rejoins this server · 18 lines</span><span class="ui-win__st" data-st>Saved</span><span class="ui-win__age">9m</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="4">FU</span><span class="ui-win__who">fps-unlock.luau</span><span class="ui-win__sub">Lifts the frame cap · 4 lines</span><span class="ui-win__st" data-st>Saved</span><span class="ui-win__age">1h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="2">WP</span><span class="ui-win__who">waypoints.luau</span><span class="ui-win__sub">Saves map points · 41 lines</span><span class="ui-win__st is-done" data-st>Ran</span><span class="ui-win__age">2h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="5">CL</span><span class="ui-win__who">chat-log.luau</span><span class="ui-win__sub">Writes chat to a file · 26 lines</span><span class="ui-win__st is-done" data-st>Ran</span><span class="ui-win__age">3h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="3">SH</span><span class="ui-win__who">server-hop.luau</span><span class="ui-win__sub">Finds a fuller server · 33 lines</span><span class="ui-win__st is-done" data-st>Ran</span><span class="ui-win__age">5h</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="1">AF</span><span class="ui-win__who">anti-afk.luau</span><span class="ui-win__sub">Stops the idle kick · 9 lines</span><span class="ui-win__st is-done" data-st>Ran</span><span class="ui-win__age">1d</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="4">CM</span><span class="ui-win__who">camera.luau</span><span class="ui-win__sub">Free camera · 52 lines</span><span class="ui-win__st is-done" data-st>Ran</span><span class="ui-win__age">2d</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="2">NT</span><span class="ui-win__who">notes.luau</span><span class="ui-win__sub">Prints saved notes · 12 lines</span><span class="ui-win__st is-done" data-st>Ran</span><span class="ui-win__age">4d</span></li>
+                  <li class="ui-win__row" data-row><span class="ui-avatar" data-tone="5">TM</span><span class="ui-win__who">timer.luau</span><span class="ui-win__sub">Times a round · 15 lines</span><span class="ui-win__st is-done" data-st>Ran</span><span class="ui-win__age">6d</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="app__pane app__pane--open" data-ui-loop>
+          <div class="ui ui-panel ui-code" data-ui="code">
+            <div class="ui-code__tabs">
+              <span class="ui-code__tab is-on"><i class="ui-code__lang">LU</i>players.luau</span>
+              <span class="ui-code__tab"><i class="ui-code__lang">LU</i>rejoin.luau</span>
+              <span class="ui-spacer"></span>
+              <span class="ui-chip ui-chip--plain ui-code__chip" data-code-chip>3 ms</span>
+            </div>
+            <pre class="ui-code__pre"><code><span class="ui-code__ln" data-n="1"><span class="c">-- players.luau: who is in this server</span></span>
+<span class="ui-code__ln" data-n="2"><span class="k">local</span> Players = game:<span class="f">GetService</span>("Players")</span>
+<span class="ui-code__ln" data-n="3"><span class="k">local</span> Teams = game:<span class="f">GetService</span>("Teams")</span>
+<span class="ui-code__ln is-mark" data-n="4"><span class="k">local</span> list = Players:<span class="f">GetPlayers</span>()</span>
+<span class="ui-code__ln" data-n="5">&nbsp;</span>
+<span class="ui-code__ln" data-n="6"><span class="k">local function</span> <span class="f">teamOf</span>(p)</span>
+<span class="ui-code__ln" data-n="7">  <span class="k">if</span> p.Team <span class="k">then return</span> p.Team.Name <span class="k">end</span></span>
+<span class="ui-code__ln" data-n="8">  <span class="k">return</span> "none"</span>
+<span class="ui-code__ln" data-n="9"><span class="k">end</span></span>
+<span class="ui-code__ln" data-n="10">&nbsp;</span>
+<span class="ui-code__ln" data-n="11" data-note="Sorts the list by account age, oldest first."><span class="f">table.sort</span>(list, <span class="k">function</span>(a, b)</span>
+<span class="ui-code__ln" data-n="12">  <span class="k">return</span> a.AccountAge &gt; b.AccountAge</span>
+<span class="ui-code__ln" data-n="13"><span class="k">end</span>)</span>
+<span class="ui-code__ln" data-n="14">&nbsp;</span>
+<span class="ui-code__ln" data-n="15" data-note="Prints one line per player to the console."><span class="k">for</span> i, p <span class="k">in</span> list <span class="k">do</span></span>
+<span class="ui-code__ln" data-n="16">  <span class="f">print</span>(i, p.Name, <span class="f">teamOf</span>(p), p.AccountAge)</span>
+<span class="ui-code__ln" data-n="17"><span class="k">end</span></span>
+<span class="ui-code__ln" data-n="18">&nbsp;</span>
+<span class="ui-code__ln" data-n="19"><span class="f">print</span>("In server:", #list, "of", Players.MaxPlayers)</span>
+<span class="ui-code__ln" data-n="20">&nbsp;</span>
+<span class="ui-code__ln" data-n="21"><span class="c">-- run again when someone joins</span></span>
+<span class="ui-code__ln" data-n="22">Players.PlayerAdded:<span class="f">Connect</span>(<span class="k">function</span>(p)</span>
+<span class="ui-code__ln" data-n="23">  <span class="f">print</span>("Joined:", p.Name, <span class="f">teamOf</span>(p))</span>
+<span class="ui-code__ln" data-n="24"><span class="k">end</span>)</span>
+<span class="ui-code__ln" data-n="25">&nbsp;</span>
+<span class="ui-code__ln" data-n="26">Players.PlayerRemoving:<span class="f">Connect</span>(<span class="k">function</span>(p)</span>
+<span class="ui-code__ln" data-n="27">  <span class="f">print</span>("Left:", p.Name)</span>
+<span class="ui-code__ln" data-n="28"><span class="k">end</span>)</span></code></pre>
+            <div class="ui-code__hint" data-code-hint><span class="ui-dot"></span><span data-code-text>Reads every player in the server once.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section g2 g2m" id="features" aria-labelledby="features-h">
+    <div class="wrap">
+      <div class="group">
+        <div class="section-head">
+          <h2 id="features-h">The executor&rsquo;s tools. <span class="muted">Auto-run, a script hub, multi-instance and a console.</span></h2>
+        </div>
+        <div class="grid">
+          <article class="card card--row card--open span-6" id="auto-run">
+            <h3>Auto-run starts Luau scripts on join</h3>
+            <p>Scripts in the auto-run folder run each time you join a server.</p>
+            <div class="panel" data-fx="fluted-glass" data-fx-seed="21" data-fx-params='{"drift":0}'>
+              <div class="stage stage--fade-b"><div class="at-right to-edge" style="--ax:32px;--ay:56px" data-ui-loop>
+                <div class="ui ui-panel ui-toggles" data-ui="toggles">
+                  <div class="ui-head">
+                    <svg class="ui-icon ui-toggles__ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg>
+                    <div class="ui-title">Wyrex settings</div>
+                    <span class="ui-spacer"></span>
+                    <div class="ui-meta" data-tg-count>4 of 5 on</div>
+                  </div>
+                  <ul class="ui-toggles__list">
+                    <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Attach when Roblox opens</span><span class="ui-tg__sub">Watches for the game window</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Attach when Roblox opens"><i></i></button></li>
+                    <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Run the auto-run folder</span><span class="ui-tg__sub">3 scripts, on every join</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Run the auto-run folder"><i></i></button></li>
+                    <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Keep Wyrex on top</span><span class="ui-tg__sub">Over the Roblox window</span></span><button class="ui-switch" type="button" role="switch" aria-checked="false" aria-label="Keep Wyrex on top"><i></i></button></li>
+                    <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Unlock the frame rate</span><span class="ui-tg__sub">Up to 240 frames a second</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Unlock the frame rate"><i></i></button></li>
+                    <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Reopen tabs on launch</span><span class="ui-tg__sub">Your last 6 tabs</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Reopen tabs on launch"><i></i></button></li>
+                  </ul>
+                </div>
+              </div></div>
+            </div>
+          </article>
+          <article class="card card--row card--open span-6" id="hub">
+            <h3>Script hub finds Roblox scripts by name</h3>
+            <p>Search the hub by name or game and open a result in a new tab.</p>
+            <div class="panel" data-fx="fluted-glass" data-fx-seed="34" data-fx-params='{"drift":0}'>
+              <div class="stage stage--fade-b"><div class="at-rise fit to-edge" style="--fit-max:400px;--ax:max(24px, 50% - 200px);--ay:56px;--ay-sm:56px">
+                <div class="ui ui-panel ui-search" data-ui="search">
+                  <div class="ui-search__field">
+                    <svg class="ui-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg>
+                    <span class="ui-search__q"><span data-search-q>rejoin</span><i class="ui-search__caret"></i></span>
+                    <kbd class="ui-search__kbd">Ctrl K</kbd>
+                  </div>
+                  <div class="ui-search__group">Script hub</div>
+                  <ul class="ui-search__list" data-search-list>
+                    <li class="ui-search__row is-sel"><span class="ui-search__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M4 2.5h5l3 3v8H4z"/><path d="M9 2.5v3h3"/></svg></span><span class="ui-search__t"><b>Rejoin</b> the same server</span><span class="ui-search__m">18 lines</span></li>
+                    <li class="ui-search__row"><span class="ui-search__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M4 2.5h5l3 3v8H4z"/><path d="M9 2.5v3h3"/></svg></span><span class="ui-search__t"><b>Rejoin</b> after a kick</span><span class="ui-search__m">24 lines</span></li>
+                    <li class="ui-search__row"><span class="ui-search__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M4 2.5h5l3 3v8H4z"/><path d="M9 2.5v3h3"/></svg></span><span class="ui-search__t">Auto <b>rejoin</b> on update</span><span class="ui-search__m">31 lines</span></li>
+                  </ul>
+                  <div class="ui-search__foot"><span><kbd>&uarr;</kbd><kbd>&darr;</kbd> to move</span><span><kbd>Enter</kbd> to open</span></div>
+                </div>
+              </div></div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card card--row card--open span-6" id="multi">
+          <h3>Multi-instance runs several Roblox windows</h3>
+          <p>Wyrex attaches to every Roblox window and runs a script in the ones you pick.</p>
+          <div class="panel" data-fx="fluted-glass" data-fx-seed="47" data-fx-params='{"drift":0}'>
+            <div class="stage stage--fade-b"><div class="at-rise fit" style="--fit-max:380px;--ax:max(24px, 50% - 190px);--ay:calc(100% - 180px);--ay-sm:24px">
+              <div class="ui ui-notify" data-ui="notify">
+                <ul class="ui-notify__list" data-notify-list>
+                  <li class="ui-note"><span class="ui-agent ui-note__av" aria-hidden="true"></span><span class="ui-note__text"><span class="ui-note__title">Attached to window 2<time>now</time></span><span class="ui-note__body">Roblox, PID 15102</span></span><span class="ui-btn ui-btn--sm ui-note__btn">Open</span></li>
+                  <li class="ui-note"><span class="ui-note__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M4 3.5v9l8-4.5z"/></svg></span><span class="ui-note__text"><span class="ui-note__title">auto-run.luau ran<time>1m</time></span><span class="ui-note__body">In windows 1 and 2</span></span></li>
+                  <li class="ui-note"><span class="ui-note__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg></span><span class="ui-note__text"><span class="ui-note__title">Wyrex 3.2.1 installed<time>9m</time></span><span class="ui-note__body">Matches today's Roblox update</span></span></li>
+                </ul>
+              </div>
+            </div></div>
+          </div>
+        </article>
+        <article class="card card--row card--open span-6" id="console">
+          <h3>Console names the failing Luau line</h3>
+          <p>Output, warnings and errors print with the script name and line number.</p>
+          <div class="panel" data-fx="fluted-glass" data-fx-seed="58" data-fx-params='{"drift":0}'>
+            <div class="stage stage--fade-b"><div class="at-rise fit" style="--fit-max:440px;--ax:max(24px, 50% - 220px);--ay:40px;--ay-sm:40px">
+              <div class="ui ui-panel ui-term" data-ui="terminal-run">
+                <div class="ui-term__head">
+                  <span class="ui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                  <span class="ui-term__title">Wyrex console</span>
+                  <span class="ui-meta">Luau</span>
+                  <span class="ui-spacer"></span>
+                  <span class="ui-chip ui-chip--plain ui-term__branch">window 1</span>
+                </div>
+                <div class="ui-term__screen" data-term-screen>
+                  <div class="ui-term__track" data-term-track>
+                    <div class="ui-term__ln ui-term__cmd"><span class="ui-term__cwd">~/<span class="ui-term__up">scripts/</span>auto-run</span><span class="ui-term__sig">&gt;</span><span class="ui-term__typed" data-term-cmd>run all</span></div>
+                    <div class="ui-term__ln ui-term__meter" data-term-out data-term-meter><span class="ui-term__bar" style="--p:1"><i></i></span><span class="ui-term__count" data-term-count>3 of 3 scripts</span></div>
+                    <div class="ui-term__ln ui-term__log" data-term-out data-term-step><svg class="ui-term__tick" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg><span class="ui-term__path">fps-unlock.luau</span><span class="ui-term__n">4 lines</span><span class="ui-term__t">2ms</span></div>
+                    <div class="ui-term__ln ui-term__log" data-term-out data-term-step><svg class="ui-term__tick" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg><span class="ui-term__path">anti-afk.luau</span><span class="ui-term__n">9 lines</span><span class="ui-term__t">3ms</span></div>
+                    <div class="ui-term__ln ui-term__log" data-term-out data-term-step><svg class="ui-term__tick" viewBox="0 0 16 16" aria-hidden="true"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg><span class="ui-term__path">waypoints.luau</span><span class="ui-term__n">41 lines</span><span class="ui-term__t">9ms</span></div>
+                    <div class="ui-term__ln ui-term__gap" data-term-out aria-hidden="true"></div>
+                    <div class="ui-term__ln ui-term__sum" data-term-out><span class="ui-term__key">Scripts</span><span class="ui-term__val">3 ran</span><span class="ui-term__dim">(3)</span></div>
+                    <div class="ui-term__ln ui-term__sum" data-term-out><span class="ui-term__key">Errors</span><span class="ui-term__val">0</span><span class="ui-term__dim">(0)</span></div>
+                    <div class="ui-term__ln ui-term__done" data-term-out data-term-done><span class="ui-term__ok"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4.5 8.3 2.4 2.4 4.6-5"/></svg></span><b>Done</b><span class="ui-term__dim">in 14ms</span></div>
+                    <div class="ui-term__ln ui-term__cmd" data-term-next><span class="ui-term__cwd">~/<span class="ui-term__up">scripts/</span>auto-run</span><span class="ui-term__sig">&gt;</span><span class="ui-term__typed"></span><i class="ui-term__caret" aria-hidden="true"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section ground-inverse" id="external" aria-labelledby="external-h">
+    <div class="wrap">
+      <div class="grid">
+        <div class="span-6 stack-5">
+          <h2 id="external-h">Wyrex External works from outside Roblox</h2>
+          <p class="t-lead">It runs as its own process, reads player positions from memory and draws names, boxes and distance over the game window.</p>
+          <ul class="facts">
+            <li>Nothing is injected into the Roblox client</li>
+            <li>The overlay draws at your monitor's refresh rate</li>
+            <li>F2 hides the overlay, F3 opens its settings</li>
+          </ul>
+          <a class="link" href="#pricing">Compare Free and Pro</a>
+        </div>
+        <div class="frame frame--split span-6 start-7" data-visual role="img" aria-label="The Wyrex External overlay over a game drawn in lines: three players marked with boxes, names, distance and health, one of them highlighted">
+          <i class="wx-reg" aria-hidden="true"></i>
+          <div class="wx-hud" aria-hidden="true"><i></i>Wyrex External · 144 fps</div>
+          <svg class="wx-scene" viewBox="0 0 640 512" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <!-- the ground: a perspective grid to the horizon -->
+            <g class="g">
+              <path d="M0 214H640"/>
+              <path d="M0 226H640M0 242H640M0 264H640M0 294H640M0 336H640M0 394H640M0 474H640"/>
+              <path d="M320 214L-420 512M320 214L-170 512M320 214L40 512M320 214L210 512M320 214L320 512M320 214L430 512M320 214L600 512M320 214L810 512M320 214L1060 512"/>
+            </g>
+            <!-- blocks of the map, in wire -->
+            <g class="b">
+              <path d="M70 330V250L150 232V312Z M150 232L196 246V326L150 312 M70 250L116 264H196 M116 264V344L70 330 M116 344H196V326"/>
+              <path d="M468 300V190L566 170V280Z M566 170L612 184V294L566 280 M468 190L514 204H612 M514 204V314L468 300 M514 314H612V294"/>
+              <path d="M262 218V176H330V218 M330 176L352 182V222 M262 176L284 170H352"/>
+              <path d="M0 150H40V214 M40 150L64 140V206"/>
+            </g>
+            <!-- the overlay: one box per player, a name, distance and a health bar -->
+            <g>
+              <rect class="esp" x="226" y="252" width="52" height="96"/>
+              <rect class="hp" x="218" y="270" width="3" height="78"/>
+              <text x="226" y="240">mintfox · 61</text>
+              <rect class="esp esp--on" x="368" y="270" width="68" height="128"/>
+              <rect class="hp hp--on" x="358" y="300" width="4" height="98"/>
+              <text class="t--on" x="368" y="258">kestrel_09 · 38</text>
+              <rect class="esp" x="482" y="214" width="30" height="58"/>
+              <rect class="hp" x="476" y="224" width="2" height="48"/>
+              <text x="456" y="202">orbit · 114</text>
+              <path class="esp esp--on" d="M320 512L402 398"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing" style="--hm: 2" aria-labelledby="pricing-h">
+    <div class="wrap">
+      <div class="grid fill">
+        <div class="span-4 stack-4">
+          <h2 id="pricing-h">Pricing</h2>
+          <p>Free runs the Executor with a daily key. Pro adds Wyrex External and drops the key. Both get each new build.</p>
+          <a class="link" href="#faq">Read the questions</a>
+        </div>
+        <article class="card card--plan span-4 start-5">
+          <h3>Free</h3>
+          <p>For trying scripts on one account</p>
+          <div class="price"><span class="t-stat">$0</span></div>
+          <a class="btn btn--primary" href="downloads/Wyrex-Setup.exe" download>Download for Windows<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+          <ul class="checks">
+            <li>The Executor and its editor</li>
+            <li>Script hub and auto-run</li>
+            <li>A key you renew every 24 hours</li>
+            <li>One Roblox window at a time</li>
+          </ul>
+          <div class="wx-mini ui" role="img" aria-label="The Wyrex key prompt: a key field, the time until the key renews and a Get key button">
+            <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>Wyrex · Key</div>
+            <div class="wx-mini__body" aria-hidden="true">
+              <div class="wx-mini__field">WYX-4K2Q-91TD</div>
+              <div class="wx-mini__row"><span>Renews in</span><span>18 h 40 min</span></div>
+              <div class="wx-mini__row"><span>Windows</span><span>1 of 1</span></div>
+              <div class="wx-mini__acts"><span>Check key</span><span>New key</span></div>
+            </div>
+          </div>
+        </article>
+        <article class="card card--plan span-4 start-9 is-featured">
+          <h3>Pro <span class="badge">With External</span></h3>
+          <p>For players who run scripts every day</p>
+          <div class="price"><span class="t-stat">$6.49</span><span class="t-small muted">a month</span></div>
+          <a class="btn btn--secondary" href="mailto:sales@wyrex.example?subject=Wyrex%20Pro">Buy Wyrex Pro</a>
+          <ul class="checks">
+            <li>No key to renew</li>
+            <li>Wyrex External and its overlay</li>
+            <li>Up to 4 Roblox windows at once</li>
+          </ul>
+          <div class="wx-mini ui" role="img" aria-label="Wyrex Pro status: no key needed, Wyrex External on, two of four Roblox windows attached">
+            <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>Wyrex · Pro</div>
+            <div class="wx-mini__body" aria-hidden="true">
+              <div class="wx-mini__field">No key needed</div>
+              <div class="wx-mini__row"><span>External</span><span class="wx-mini__on">On, 144 fps</span></div>
+              <div class="wx-mini__row"><span>Windows</span><span>2 of 4</span></div>
+              <div class="wx-mini__acts"><span>External</span><span>Attach</span></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section g2m" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="faq-a">
+        <div class="faq-head stack-4">
+          <h2 id="faq-h">Questions</h2>
+          <p>What people ask before they download.</p>
+          <a class="link" href="mailto:help@wyrex.example">Email support</a>
+        </div>
+        <div class="faq faq-1">
+          <div class="faq__item"><h3>Is Wyrex free?</h3><p>Yes, with a key you renew every 24 hours. Pro drops the key.</p></div>
+          <div class="faq__item"><h3>Which Windows versions work?</h3><p>Windows 10 and 11, 64-bit. The installer adds WebView2 if it is missing.</p></div>
+        </div>
+      </div>
+      <div class="faq-b">
+        <div class="wx-mini ui faq-status" role="img" aria-label="The Wyrex status panel: the Roblox build is matched, Wyrex 3.2.1 is up to date, Windows 11 64-bit, WebView2 installed">
+          <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>Wyrex · Status</div>
+          <div class="wx-mini__body" aria-hidden="true">
+            <div class="wx-mini__row"><span>Roblox build</span><span class="wx-mini__on">Matched</span></div>
+            <div class="wx-mini__row"><span>Wyrex</span><span>3.2.1, up to date</span></div>
+            <div class="wx-mini__row"><span>Windows</span><span>11, 64-bit</span></div>
+            <div class="wx-mini__row"><span>WebView2</span><span>Installed</span></div>
+          </div>
+        </div>
+        <div class="faq faq-2">
+          <div class="faq__item"><h3>How is the External different?</h3><p>It reads the game from its own process, so nothing is injected into Roblox.</p></div>
+          <div class="faq__item"><h3>Can my Roblox account be banned?</h3><p>Yes. Scripts break the Roblox Terms of Use and any account can be banned. Use one you can lose.</p></div>
+          <div class="faq__item"><h3>What happens when Roblox updates?</h3><p>Wyrex pauses until a matching build ships, then updates itself on launch.</p></div>
+          <div class="faq__item"><h3>Does Wyrex run on Mac or mobile?</h3><p>No. Wyrex runs on Windows PCs only.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing footer--dark ground-inverse g2m" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--word">
+      <div class="section-head--split">
+        <div><h2 id="close-h">Download Wyrex for Windows</h2><p class="t-lead">Free on Windows 10 and 11.</p></div>
+        <a class="btn btn--primary" href="#pricing">Download for Windows<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+      </div>
+      <p class="close__word" aria-hidden="true">Wyrex</p>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>Wyrex</a>
+          <p class="footer__lede">Roblox executor and external for PC.</p>
+        </div>
+        <div class="span-2 footer__col"><h4>Executor</h4><ul><li><a href="#editor">Editor</a></li><li><a href="#auto-run">Auto-run</a></li><li><a href="#hub">Script hub</a></li><li><a href="#multi">Multi-instance</a></li><li><a href="#console">Console</a></li></ul></div>
+        <div class="span-2 footer__col"><h4>External</h4><ul><li><a href="#external">External</a></li></ul></div>
+        <div class="span-2 footer__col"><h4>Pricing</h4><ul><li><a href="#pricing">Pricing</a></li><li><a href="#faq">Questions</a></li></ul></div>
+        <div class="span-2 footer__col"><h4>Help</h4><ul><li><a href="mailto:help@wyrex.example">Email support</a></li></ul></div>
+      </div>
+      <div class="footer__legal">
+        <span>&copy; 2026 Wyrex &nbsp; Not affiliated with Roblox Corporation</span>
+        <div class="socials"></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
+</body>
+</html>
