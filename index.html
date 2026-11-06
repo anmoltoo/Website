@@ -4,8 +4,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Wyrex: Roblox executor and external for PC</title>
-<meta name="description" content="Wyrex runs Luau scripts inside Roblox with a tabbed editor and console, and Wyrex External reads the game from outside the client. Free on Windows 10 and 11.">
+<title>log: Roblox executor and external for PC</title>
+<meta name="description" content="log runs Luau scripts inside Roblox with a tabbed editor and console, and log External reads the game from outside the client. Free on Windows 10 and 11.">
+<link rel="icon" href="assets/brand/log-mark.svg" type="image/svg+xml">
 <meta name="site-kind" content="software">
 <meta name="page-type" content="software">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,19 +45,27 @@
 <style>
   html[data-buttons="pill"] .btn--secondary, html[data-buttons="pill"] .btn--secondary:hover { border-color: color-mix(in oklab, var(--ink) 70%, transparent); }
   @media (max-width: 639px) { .hero--centred .pill .muted { display: none; } }
+  /* the log brand: a wire-drawn log (its end ring in the accent) beside the name in the mono face */
+  .logmark { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+  .logmark .logmark__ring { stroke: var(--accent); }
+  .logmark .logmark__core { fill: var(--accent); stroke: none; }
+  .nav__logo { gap: 10px; }
+  .logword { font-family: var(--font-mono); font-weight: 500; letter-spacing: -0.02em; }
+  .logmark--h1 { display: inline-block; width: .82em; height: .82em; vertical-align: -.08em; stroke-width: 1.5; margin-right: .04em; }
+  .close__word { font-family: var(--font-mono); letter-spacing: -0.06em; }
   .skip { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .skip:focus { width: auto; height: auto; clip-path: none; z-index: 20; padding: var(--s-2) var(--s-3); background: var(--bg); outline: 2px solid var(--action); }
   /* the wireframe look: every window and fragment drawn in hairlines of the ink, no shadow, small square corners */
   .ui { --ui-radius: 4px; --ui-mono: var(--font-mono); --u-shadow: none; --u-shadow-sm: none;
         --u-border: color-mix(in oklab, var(--u-ink) 42%, transparent); --u-line: color-mix(in oklab, var(--u-ink) 16%, transparent); }
 
-  /* hero: the Wyrex window, drawn as a wireframe over the lit frame */
+  /* hero: the log window, drawn as a wireframe over the lit frame */
   .wx-win { --wl: color-mix(in oklab, var(--p-ink) 18%, transparent); --wl-2: color-mix(in oklab, var(--p-ink) 55%, transparent);
             background: #f1efea; color: var(--p-ink); border: 1px solid var(--wl-2); border-radius: 4px; overflow: visible; font: 400 13px/1.45 var(--font-text); text-align: left; }
   .wx-win__bar { display: flex; align-items: center; gap: 12px; height: 40px; padding: 0 12px; border-bottom: 1px solid var(--wl); }
   .wx-dots { display: flex; gap: 6px; } .wx-dots i { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--wl-2); }
   .wx-win__bar b { font-weight: 500; }
-  .wx-logo { width: 16px; height: 16px; fill: none; stroke: var(--p-accent); stroke-width: 1.2; flex: none; } .wx-win__bar .sp { flex: 1; }
+  .wx-logo { width: 18px; height: 18px; } .wx-win__bar .sp { flex: 1; }
   .wx-win__bar .wx-dim { color: #55514c; }
   .wx-seg { display: inline-flex; border: 1px solid var(--wl-2); border-radius: 4px; overflow: hidden; }
   .wx-seg span { padding: 3px 10px; } .wx-seg span + span { border-left: 1px solid var(--wl-2); }
@@ -131,7 +140,7 @@
   @media (max-width: 639px) { #features .panel { --p-h: 140px; } }
   @media (min-width: 1024px) and (max-width: 1279px) { #features .panel { --p-h: 296px; } }
 
-  /* Wyrex External: the overlay over a game, drawn in lines */
+  /* log External: the overlay over a game, drawn in lines */
   #external .frame > .wx-scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .wx-scene .g { stroke: color-mix(in oklab, var(--p-inv-ink) 22%, transparent); stroke-width: 1; fill: none; }
   .wx-scene .b { stroke: color-mix(in oklab, var(--p-inv-ink) 46%, transparent); stroke-width: 1; fill: none; }
@@ -156,7 +165,7 @@
   .hero__window > .wx-reg { color: var(--p-ink); bottom: auto; height: 120px; }
   #external .frame > .wx-reg { position: absolute; color: var(--p-inv-ink); }
   #external .frame > .wx-hud { left: 40px; top: 40px; }
-  /* pricing: each plan shows the screen it gets, a small Wyrex window drawn in lines */
+  /* pricing: each plan shows the screen it gets, a small log window drawn in lines */
   .wx-mini { --wl: color-mix(in oklab, var(--p-ink) 18%, transparent); --wl-2: color-mix(in oklab, var(--p-ink) 55%, transparent); border: 1px solid color-mix(in oklab, var(--ink) 42%, transparent); border-radius: 4px; background: #efece6; font: 13px/1.4 var(--font-mono); color: var(--p-ink); overflow: hidden; }
   .wx-mini__bar { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border-bottom: 1px solid color-mix(in oklab, var(--ink) 16%, transparent); font-family: var(--font-text); }
   .wx-mini__bar .wx-dots i { width: 8px; height: 8px; }
@@ -213,8 +222,8 @@
 </style>
 </head>
 <body>
-<!-- type: software (page type software, site-kind software). Wyrex: a Roblox script executor (Luau, runs inside the client)
-     and Wyrex External (a separate process that reads the game and draws an overlay). Main action: Download for Windows.
+<!-- type: software (page type software, site-kind software). log: a Roblox script executor (Luau, runs inside the client)
+     and log External (a separate process that reads the game and draws an overlay). Main action: Download for Windows.
      deal: hero centred, nav nav-mega, close close-word, footer footer-dark, rhythm dark-band, buttons pill, mark arc,
            palette putty-black-teal, type chivo (Chivo + Chivo Mono), radius sharp (a developer tool), lit ground sage,
            grounds: bg-ruled on the hero (taken by the brief's wireframe theme in place of the dealt bg-topglow; ruled lists
@@ -228,7 +237,7 @@
 <header class="nav">
   <div class="wrap nav__bar">
     <a class="skip" href="#editor">Skip to content</a>
-    <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>Wyrex</a>
+    <a class="nav__logo" href="#top"><svg class="logmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5H6.5a2.6 6.5 0 0 0 0 13H16"/><circle cx="16" cy="12" r="6.5"/><circle class="logmark__ring" cx="16" cy="12" r="3.6"/><circle class="logmark__core" cx="16" cy="12" r="1"/></svg><span class="logword">log</span></a>
     <nav class="nav__links" aria-label="Main">
       <div class="nav__item">
         <a class="nav__link" href="#features">Executor <svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -265,15 +274,15 @@
   <section class="hero hero--centred bg-ruled" aria-labelledby="hero-h">
     <div class="wrap"><div class="hero-text">
       <div class="hero__c">
-        <a class="pill" href="#external"><span>Wyrex External is in the same download</span><span class="muted">See the overlay</span></a>
-        <h1 id="hero-h" aria-label="Roblox executor and external for PC"><span class="ly-mark" aria-hidden="true"></span> Roblox executor and external for PC</h1>
-        <p class="hero__lead">Wyrex runs Luau scripts inside Roblox from a tabbed editor with a console. Wyrex External reads the game from outside the client. Free on Windows 10 and 11.</p>
+        <a class="pill" href="#external"><span>log External is in the same download</span><span class="muted">See the overlay</span></a>
+        <h1 id="hero-h" aria-label="Roblox executor and external for PC"><svg class="logmark logmark--h1" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5H6.5a2.6 6.5 0 0 0 0 13H16"/><circle cx="16" cy="12" r="6.5"/><circle class="logmark__ring" cx="16" cy="12" r="3.6"/><circle class="logmark__core" cx="16" cy="12" r="1"/></svg> Roblox executor and external for PC</h1>
+        <p class="hero__lead">log runs Luau scripts inside Roblox from a tabbed editor with a console. log External reads the game from outside the client. Free on Windows 10 and 11.</p>
         <div class="btn-row"><a class="btn btn--primary" href="#pricing">Download for Windows<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="#pricing">See pricing</a></div>
       </div>
-      <div class="hero__window" data-fx="silk-folds" data-fx-seed="11" role="img" aria-label="The Wyrex window attached to Roblox: a Luau script that lists the players in the server, the Execute button, and the console printing each name">
+      <div class="hero__window" data-fx="silk-folds" data-fx-seed="11" role="img" aria-label="The log window attached to Roblox: a Luau script that lists the players in the server, the Execute button, and the console printing each name">
         <i class="wx-reg" aria-hidden="true"></i>
         <div class="ly-piece wx-win ui" aria-hidden="true">
-          <div class="wx-win__bar"><span class="wx-dots"><i></i><i></i><i></i></span><svg class="wx-logo" viewBox="0 0 16 16"><path d="M3 13V8a5 5 0 0 1 10 0v5h-3V8a2 2 0 0 0-4 0v5z"/></svg><span><b>Wyrex</b> <span class="wx-dim">· attached to Roblox · PID 14820</span></span><span class="sp"></span><span class="wx-seg"><span class="is-on">Executor</span><span>External</span></span></div>
+          <div class="wx-win__bar"><span class="wx-dots"><i></i><i></i><i></i></span><svg class="logmark wx-logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5H6.5a2.6 6.5 0 0 0 0 13H16"/><circle cx="16" cy="12" r="6.5"/><circle class="logmark__ring" cx="16" cy="12" r="3.6"/><circle class="logmark__core" cx="16" cy="12" r="1"/></svg><span><b>log</b> <span class="wx-dim">· attached to Roblox · PID 14820</span></span><span class="sp"></span><span class="wx-seg"><span class="is-on">Executor</span><span>External</span></span></div>
           <div class="wx-win__body">
             <div class="wx-files">
               <div class="q">Search scripts</div>
@@ -318,12 +327,12 @@
           <a class="link" href="#console">See the console</a>
         </div>
       </div>
-      <div class="ui app fill" role="img" aria-label="The Wyrex script library beside the open script, players.luau, with a note on the marked line" data-ui-pause-host>
+      <div class="ui app fill" role="img" aria-label="The log script library beside the open script, players.luau, with a note on the marked line" data-ui-pause-host>
         <div class="app__pane app__pane--list">
           <div class="ui ui-panel ui-win" data-ui="window" data-open="Saved" data-work="Running" data-done="Ran">
             <div class="ui-win__bar">
               <span class="ui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="ui-win__crumb">Wyrex <i>/</i> <b>Library</b></span>
+              <span class="ui-win__crumb">log <i>/</i> <b>Library</b></span>
               <span class="ui-spacer"></span>
               <span class="ui-win__search" aria-hidden="true"><svg class="ui-icon" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.5"/><path d="m10.5 10.5 3 3"/></svg><span class="ui-win__ph">Search</span><span class="ui-kbd">/</span></span>
             </div>
@@ -413,14 +422,14 @@
                 <div class="ui ui-panel ui-toggles" data-ui="toggles">
                   <div class="ui-head">
                     <svg class="ui-icon ui-toggles__ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg>
-                    <div class="ui-title">Wyrex settings</div>
+                    <div class="ui-title">log settings</div>
                     <span class="ui-spacer"></span>
                     <div class="ui-meta" data-tg-count>4 of 5 on</div>
                   </div>
                   <ul class="ui-toggles__list">
                     <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Attach when Roblox opens</span><span class="ui-tg__sub">Watches for the game window</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Attach when Roblox opens"><i></i></button></li>
                     <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Run the auto-run folder</span><span class="ui-tg__sub">3 scripts, on every join</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Run the auto-run folder"><i></i></button></li>
-                    <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Keep Wyrex on top</span><span class="ui-tg__sub">Over the Roblox window</span></span><button class="ui-switch" type="button" role="switch" aria-checked="false" aria-label="Keep Wyrex on top"><i></i></button></li>
+                    <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Keep log on top</span><span class="ui-tg__sub">Over the Roblox window</span></span><button class="ui-switch" type="button" role="switch" aria-checked="false" aria-label="Keep log on top"><i></i></button></li>
                     <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Unlock the frame rate</span><span class="ui-tg__sub">Up to 240 frames a second</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Unlock the frame rate"><i></i></button></li>
                     <li class="ui-tg"><span class="ui-tg__text"><span class="ui-tg__label">Reopen tabs on launch</span><span class="ui-tg__sub">Your last 6 tabs</span></span><button class="ui-switch is-on" type="button" role="switch" aria-checked="true" aria-label="Reopen tabs on launch"><i></i></button></li>
                   </ul>
@@ -455,14 +464,14 @@
       <div class="grid">
         <article class="card card--row card--open span-6" id="multi">
           <h3>Multi-instance runs several Roblox windows</h3>
-          <p>Wyrex attaches to every Roblox window and runs a script in the ones you pick.</p>
+          <p>log attaches to every Roblox window and runs a script in the ones you pick.</p>
           <div class="panel" data-fx="fluted-glass" data-fx-seed="47" data-fx-params='{"drift":0}'>
             <div class="stage stage--fade-b"><div class="at-rise fit" style="--fit-max:380px;--ax:max(24px, 50% - 190px);--ay:calc(100% - 180px);--ay-sm:24px">
               <div class="ui ui-notify" data-ui="notify">
                 <ul class="ui-notify__list" data-notify-list>
                   <li class="ui-note"><span class="ui-agent ui-note__av" aria-hidden="true"></span><span class="ui-note__text"><span class="ui-note__title">Attached to window 2<time>now</time></span><span class="ui-note__body">Roblox, PID 15102</span></span><span class="ui-btn ui-btn--sm ui-note__btn">Open</span></li>
                   <li class="ui-note"><span class="ui-note__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="M4 3.5v9l8-4.5z"/></svg></span><span class="ui-note__text"><span class="ui-note__title">auto-run.luau ran<time>1m</time></span><span class="ui-note__body">In windows 1 and 2</span></span></li>
-                  <li class="ui-note"><span class="ui-note__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg></span><span class="ui-note__text"><span class="ui-note__title">Wyrex 3.2.1 installed<time>9m</time></span><span class="ui-note__body">Matches today's Roblox update</span></span></li>
+                  <li class="ui-note"><span class="ui-note__ico"><svg class="ui-icon" viewBox="0 0 16 16"><path d="m3.5 8.4 2.8 2.8 6.2-6.4"/></svg></span><span class="ui-note__text"><span class="ui-note__title">log 3.2.1 installed<time>9m</time></span><span class="ui-note__body">Matches today's Roblox update</span></span></li>
                 </ul>
               </div>
             </div></div>
@@ -476,7 +485,7 @@
               <div class="ui ui-panel ui-term" data-ui="terminal-run">
                 <div class="ui-term__head">
                   <span class="ui-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-                  <span class="ui-term__title">Wyrex console</span>
+                  <span class="ui-term__title">log console</span>
                   <span class="ui-meta">Luau</span>
                   <span class="ui-spacer"></span>
                   <span class="ui-chip ui-chip--plain ui-term__branch">window 1</span>
@@ -507,7 +516,7 @@
     <div class="wrap">
       <div class="grid">
         <div class="span-6 stack-5">
-          <h2 id="external-h">Wyrex External works from outside Roblox</h2>
+          <h2 id="external-h">log External works from outside Roblox</h2>
           <p class="t-lead">It runs as its own process, reads player positions from memory and draws names, boxes and distance over the game window.</p>
           <ul class="facts">
             <li>Nothing is injected into the Roblox client</li>
@@ -516,9 +525,9 @@
           </ul>
           <a class="link" href="#pricing">Compare Free and Pro</a>
         </div>
-        <div class="frame frame--split span-6 start-7" data-visual role="img" aria-label="The Wyrex External overlay over a game drawn in lines: three players marked with boxes, names, distance and health, one of them highlighted">
+        <div class="frame frame--split span-6 start-7" data-visual role="img" aria-label="The log External overlay over a game drawn in lines: three players marked with boxes, names, distance and health, one of them highlighted">
           <i class="wx-reg" aria-hidden="true"></i>
-          <div class="wx-hud" aria-hidden="true"><i></i>Wyrex External · 144 fps</div>
+          <div class="wx-hud" aria-hidden="true"><i></i>log External · 144 fps</div>
           <svg class="wx-scene" viewBox="0 0 640 512" preserveAspectRatio="xMidYMid slice" focusable="false">
             <!-- the ground: a perspective grid to the horizon -->
             <g class="g">
@@ -557,24 +566,24 @@
       <div class="grid fill">
         <div class="span-4 stack-4">
           <h2 id="pricing-h">Pricing</h2>
-          <p>Free runs the Executor with a daily key. Pro adds Wyrex External and drops the key. Both get each new build.</p>
+          <p>Free runs the Executor with a daily key. Pro adds log External and drops the key. Both get each new build.</p>
           <a class="link" href="#faq">Read the questions</a>
         </div>
         <article class="card card--plan span-4 start-5">
           <h3>Free</h3>
           <p>For trying scripts on one account</p>
           <div class="price"><span class="t-stat">$0</span></div>
-          <a class="btn btn--primary" href="downloads/Wyrex-Setup.exe" download>Download for Windows<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+          <a class="btn btn--primary" href="downloads/log-setup.exe" download>Download for Windows<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
           <ul class="checks">
             <li>The Executor and its editor</li>
             <li>Script hub and auto-run</li>
             <li>A key you renew every 24 hours</li>
             <li>One Roblox window at a time</li>
           </ul>
-          <div class="wx-mini ui" role="img" aria-label="The Wyrex key prompt: a key field, the time until the key renews and a Get key button">
-            <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>Wyrex · Key</div>
+          <div class="wx-mini ui" role="img" aria-label="The log key prompt: a key field, the time until the key renews and a Get key button">
+            <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>log · Key</div>
             <div class="wx-mini__body" aria-hidden="true">
-              <div class="wx-mini__field">WYX-4K2Q-91TD</div>
+              <div class="wx-mini__field">LOG-4K2Q-91TD</div>
               <div class="wx-mini__row"><span>Renews in</span><span>18 h 40 min</span></div>
               <div class="wx-mini__row"><span>Windows</span><span>1 of 1</span></div>
               <div class="wx-mini__acts"><span>Check key</span><span>New key</span></div>
@@ -585,14 +594,14 @@
           <h3>Pro <span class="badge">With External</span></h3>
           <p>For players who run scripts every day</p>
           <div class="price"><span class="t-stat">$6.49</span><span class="t-small muted">a month</span></div>
-          <a class="btn btn--secondary" href="mailto:sales@wyrex.example?subject=Wyrex%20Pro">Buy Wyrex Pro</a>
+          <a class="btn btn--secondary" href="mailto:sales@log.example?subject=log%20Pro">Buy log Pro</a>
           <ul class="checks">
             <li>No key to renew</li>
-            <li>Wyrex External and its overlay</li>
+            <li>log External and its overlay</li>
             <li>Up to 4 Roblox windows at once</li>
           </ul>
-          <div class="wx-mini ui" role="img" aria-label="Wyrex Pro status: no key needed, Wyrex External on, two of four Roblox windows attached">
-            <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>Wyrex · Pro</div>
+          <div class="wx-mini ui" role="img" aria-label="log Pro status: no key needed, log External on, two of four Roblox windows attached">
+            <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>log · Pro</div>
             <div class="wx-mini__body" aria-hidden="true">
               <div class="wx-mini__field">No key needed</div>
               <div class="wx-mini__row"><span>External</span><span class="wx-mini__on">On, 144 fps</span></div>
@@ -611,19 +620,19 @@
         <div class="faq-head stack-4">
           <h2 id="faq-h">Questions</h2>
           <p>What people ask before they download.</p>
-          <a class="link" href="mailto:help@wyrex.example">Email support</a>
+          <a class="link" href="mailto:help@log.example">Email support</a>
         </div>
         <div class="faq faq-1">
-          <div class="faq__item"><h3>Is Wyrex free?</h3><p>Yes, with a key you renew every 24 hours. Pro drops the key.</p></div>
+          <div class="faq__item"><h3>Is log free?</h3><p>Yes, with a key you renew every 24 hours. Pro drops the key.</p></div>
           <div class="faq__item"><h3>Which Windows versions work?</h3><p>Windows 10 and 11, 64-bit. The installer adds WebView2 if it is missing.</p></div>
         </div>
       </div>
       <div class="faq-b">
-        <div class="wx-mini ui faq-status" role="img" aria-label="The Wyrex status panel: the Roblox build is matched, Wyrex 3.2.1 is up to date, Windows 11 64-bit, WebView2 installed">
-          <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>Wyrex · Status</div>
+        <div class="wx-mini ui faq-status" role="img" aria-label="The log status panel: the Roblox build is matched, log 3.2.1 is up to date, Windows 11 64-bit, WebView2 installed">
+          <div class="wx-mini__bar"><span class="wx-dots" aria-hidden="true"><i></i><i></i><i></i></span>log · Status</div>
           <div class="wx-mini__body" aria-hidden="true">
             <div class="wx-mini__row"><span>Roblox build</span><span class="wx-mini__on">Matched</span></div>
-            <div class="wx-mini__row"><span>Wyrex</span><span>3.2.1, up to date</span></div>
+            <div class="wx-mini__row"><span>log</span><span>3.2.1, up to date</span></div>
             <div class="wx-mini__row"><span>Windows</span><span>11, 64-bit</span></div>
             <div class="wx-mini__row"><span>WebView2</span><span>Installed</span></div>
           </div>
@@ -631,8 +640,8 @@
         <div class="faq faq-2">
           <div class="faq__item"><h3>How is the External different?</h3><p>It reads the game from its own process, so nothing is injected into Roblox.</p></div>
           <div class="faq__item"><h3>Can my Roblox account be banned?</h3><p>Yes. Scripts break the Roblox Terms of Use and any account can be banned. Use one you can lose.</p></div>
-          <div class="faq__item"><h3>What happens when Roblox updates?</h3><p>Wyrex pauses until a matching build ships, then updates itself on launch.</p></div>
-          <div class="faq__item"><h3>Does Wyrex run on Mac or mobile?</h3><p>No. Wyrex runs on Windows PCs only.</p></div>
+          <div class="faq__item"><h3>What happens when Roblox updates?</h3><p>It pauses until a matching build ships, then updates itself on launch.</p></div>
+          <div class="faq__item"><h3>Does log run on Mac or mobile?</h3><p>No. It runs on Windows PCs only.</p></div>
         </div>
       </div>
     </div>
@@ -643,24 +652,24 @@
   <div class="wrap">
     <div class="closing__cta close--word">
       <div class="section-head--split">
-        <div><h2 id="close-h">Download Wyrex for Windows</h2><p class="t-lead">Free on Windows 10 and 11.</p></div>
+        <div><h2 id="close-h">Download log for Windows</h2><p class="t-lead">Free on Windows 10 and 11.</p></div>
         <a class="btn btn--primary" href="#pricing">Download for Windows<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
       </div>
-      <p class="close__word" aria-hidden="true">Wyrex</p>
+      <p class="close__word" aria-hidden="true">log</p>
     </div>
     <div class="closing__links">
       <div class="grid">
         <div class="span-4 stack-4">
-          <a class="nav__logo" href="#top"><span class="mark" data-mark="arc" aria-hidden="true"></span>Wyrex</a>
+          <a class="nav__logo" href="#top"><svg class="logmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5H6.5a2.6 6.5 0 0 0 0 13H16"/><circle cx="16" cy="12" r="6.5"/><circle class="logmark__ring" cx="16" cy="12" r="3.6"/><circle class="logmark__core" cx="16" cy="12" r="1"/></svg><span class="logword">log</span></a>
           <p class="footer__lede">Roblox executor and external for PC.</p>
         </div>
         <div class="span-2 footer__col"><h4>Executor</h4><ul><li><a href="#editor">Editor</a></li><li><a href="#auto-run">Auto-run</a></li><li><a href="#hub">Script hub</a></li><li><a href="#multi">Multi-instance</a></li><li><a href="#console">Console</a></li></ul></div>
         <div class="span-2 footer__col"><h4>External</h4><ul><li><a href="#external">External</a></li></ul></div>
         <div class="span-2 footer__col"><h4>Pricing</h4><ul><li><a href="#pricing">Pricing</a></li><li><a href="#faq">Questions</a></li></ul></div>
-        <div class="span-2 footer__col"><h4>Help</h4><ul><li><a href="mailto:help@wyrex.example">Email support</a></li></ul></div>
+        <div class="span-2 footer__col"><h4>Help</h4><ul><li><a href="mailto:help@log.example">Email support</a></li></ul></div>
       </div>
       <div class="footer__legal">
-        <span>&copy; 2026 Wyrex &nbsp; Not affiliated with Roblox Corporation</span>
+        <span>&copy; 2026 log &nbsp; Not affiliated with Roblox Corporation</span>
         <div class="socials"></div>
       </div>
     </div>

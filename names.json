@@ -1,9 +1,7 @@
 {
-  "name": "Wyrex",
+  "name": "log",
   "trade": "Roblox script executor and external",
-  "searched": true,
-  "queries": [
-    { "query": "Wyrex roblox executor", "result": "No executor, exploit or Roblox tool named Wyrex in the results; only generic executor pages." },
-    { "query": "\"Wyrex\" software", "result": "No exact match; nearest names are WREX (back-office automation) and Werx (contractor software), different spellings and trades." }
-  ]
+  "source": "given by the client; written lowercase as the client writes it",
+  "searched": false,
+  "replaces": "Wyrex, a coined name used before the client named the product"
 }

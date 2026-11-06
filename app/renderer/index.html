@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>log</title>
+<link rel="stylesheet" href="../node_modules/@fontsource/chivo/400.css">
+<link rel="stylesheet" href="../node_modules/@fontsource/chivo/500.css">
+<link rel="stylesheet" href="../node_modules/@fontsource/chivo-mono/400.css">
+<link rel="stylesheet" href="../node_modules/@fontsource/chivo-mono/500.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<!-- log, design only: the executor window as the website draws it. No control here attaches to Roblox,
+     runs, opens or saves anything; the window dots and the Executor / External switch are the only live parts. -->
+<body data-view="executor">
+
+<header class="titlebar">
+  <div class="dots">
+    <button class="dot dot--close" type="button" aria-label="Close" data-window="close"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M3 3l4 4M7 3l-4 4"/></svg></button>
+    <button class="dot dot--min" type="button" aria-label="Minimise" data-window="minimize"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2.5 5h5"/></svg></button>
+    <button class="dot dot--max" type="button" aria-label="Maximise" data-window="maximize"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 2.5v5M2.5 5h5"/></svg></button>
+  </div>
+  <svg class="logmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5.5H6.5a2.6 6.5 0 0 0 0 13H16"/><circle cx="16" cy="12" r="6.5"/><circle class="logmark__ring" cx="16" cy="12" r="3.6"/><circle class="logmark__core" cx="16" cy="12" r="1"/></svg>
+  <span class="brand">log</span>
+  <span class="dim">· attached to Roblox · PID 14820</span>
+  <span class="sp"></span>
+  <div class="seg" role="tablist" aria-label="Mode">
+    <button class="seg__btn" type="button" role="tab" aria-selected="true" data-view-to="executor">Executor</button>
+    <button class="seg__btn" type="button" role="tab" aria-selected="false" data-view-to="external">External</button>
+  </div>
+</header>
+
+<!-- EXECUTOR: the script list, the editor with its console, the status bar -->
+<main class="view view--executor" data-view-name="executor">
+  <aside class="files">
+    <div class="search">Search scripts</div>
+    <p class="label">Scripts <span>7</span></p>
+    <ul class="file-list">
+      <li class="file is-on">players.luau</li>
+      <li class="file">rejoin.luau</li>
+      <li class="file">waypoints.luau</li>
+      <li class="file">chat-log.luau</li>
+      <li class="file">server-hop.luau</li>
+      <li class="file">camera.luau</li>
+      <li class="file">timer.luau</li>
+    </ul>
+    <p class="label">Auto-run <span>3</span></p>
+    <ul class="file-list">
+      <li class="folder is-open">auto-run/</li>
+      <li class="file file--in">fps-unlock.luau</li>
+      <li class="file file--in">anti-afk.luau</li>
+      <li class="file file--in">waypoints.luau</li>
+    </ul>
+    <div class="mini">
+      <div class="mini__bar"><span class="mini__dots"><i></i><i></i><i></i></span>Status</div>
+      <div class="mini__body">
+        <div class="mini__row"><span>Roblox build</span><span class="on">Matched</span></div>
+        <div class="mini__row"><span>log</span><span>3.2.1</span></div>
+        <div class="mini__row"><span>Key</span><span>18 h 40 min</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="work">
+    <div class="tabs">
+      <span class="tab is-on">players.luau</span>
+      <span class="tab">rejoin.luau</span>
+      <span class="tab tab--add">+</span>
+      <span class="sp"></span>
+      <div class="acts">
+        <span class="sel"><i></i><i></i><i></i><i></i><button class="act act--run" type="button">Execute</button></span>
+        <button class="act" type="button">Clear</button>
+        <button class="act" type="button">Open file</button>
+        <button class="act" type="button">Save</button>
+      </div>
+    </div>
+
+    <div class="panes">
+      <div class="editor" aria-label="players.luau">
+        <div class="ln"><span class="n">1</span><code><span class="c">-- players.luau: who is in this server</span></code></div>
+        <div class="ln"><span class="n">2</span><code><span class="k">local</span> Players = game:<span class="f">GetService</span>(<span class="s">"Players"</span>)</code></div>
+        <div class="ln"><span class="n">3</span><code><span class="k">local</span> list = Players:<span class="f">GetPlayers</span>()</code></div>
+        <div class="ln"><span class="n">4</span><code> </code></div>
+        <div class="ln is-cur"><span class="n">5</span><code><span class="k">for</span> _, p <span class="k">in</span> list <span class="k">do</span><i class="caret"></i></code></div>
+        <div class="ln"><span class="n">6</span><code>  <span class="f">print</span>(p.Name, p.AccountAge)</code></div>
+        <div class="ln"><span class="n">7</span><code><span class="k">end</span></code></div>
+        <div class="ln"><span class="n">8</span><code> </code></div>
+        <div class="ln"><span class="n">9</span><code><span class="f">print</span>(<span class="s">"In server:"</span>, #list)</code></div>
+        <div class="ln"><span class="n">10</span><code> </code></div>
+        <div class="ln"><span class="n">11</span><code><span class="c">-- run again when someone joins</span></code></div>
+        <div class="ln"><span class="n">12</span><code>Players.PlayerAdded:<span class="f">Connect</span>(<span class="k">function</span>(p)</code></div>
+        <div class="ln"><span class="n">13</span><code>  <span class="f">print</span>(<span class="s">"Joined:"</span>, p.Name)</code></div>
+        <div class="ln"><span class="n">14</span><code><span class="k">end</span>)</code></div>
+        <div class="ln"><span class="n">15</span><code> </code></div>
+        <div class="ln"><span class="n">16</span><code>Players.PlayerRemoving:<span class="f">Connect</span>(<span class="k">function</span>(p)</code></div>
+        <div class="ln"><span class="n">17</span><code>  <span class="f">print</span>(<span class="s">"Left:"</span>, p.Name)</code></div>
+        <div class="ln"><span class="n">18</span><code><span class="k">end</span>)</code></div>
+      </div>
+
+      <div class="console">
+        <div class="console__head">
+          <span class="console__title">Console</span>
+          <span class="sp"></span>
+          <span class="chip is-on">All</span>
+          <span class="chip">Errors</span>
+        </div>
+        <div class="console__body">
+          <div><time>14:02</time>Attached, PID 14820</div>
+          <div><time>14:02</time><span class="ok">Ran players.luau, 3 ms</span></div>
+          <div><time>14:02</time>kestrel_09  412</div>
+          <div><time>14:02</time>mintfox  88</div>
+          <div><time>14:02</time>orbit  1204</div>
+          <div><time>14:02</time>In server: 12</div>
+          <div><time>14:03</time>Joined: harbor_7</div>
+          <div><time>14:05</time><span class="warn">rejoin.luau:12  no server found</span></div>
+          <div><time>14:05</time>Left: mintfox</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="statusbar">
+      <span>Luau</span><span>Ln 5, Col 25</span><span>Spaces: 2</span><span>UTF-8</span>
+      <span class="sp"></span>
+      <span class="live"><i></i>Attached to Roblox · window 1 of 1</span>
+    </footer>
+  </section>
+</main>
+
+<!-- EXTERNAL: the overlay's settings beside its preview -->
+<main class="view view--external" data-view-name="external" hidden>
+  <aside class="files settings">
+    <p class="label">Overlay</p>
+    <ul class="toggles">
+      <li><span>Boxes</span><span class="switch is-on"><i></i></span></li>
+      <li><span>Names</span><span class="switch is-on"><i></i></span></li>
+      <li><span>Distance</span><span class="switch is-on"><i></i></span></li>
+      <li><span>Health bars</span><span class="switch is-on"><i></i></span></li>
+      <li><span>Team colours</span><span class="switch"><i></i></span></li>
+    </ul>
+    <p class="label">Keys</p>
+    <ul class="toggles">
+      <li><span>Hide overlay</span><kbd>F2</kbd></li>
+      <li><span>Open settings</span><kbd>F3</kbd></li>
+    </ul>
+    <p class="label">Draw limit</p>
+    <div class="range"><span class="range__track"><i></i></span><span class="range__val">300 studs</span></div>
+    <div class="mini">
+      <div class="mini__bar"><span class="mini__dots"><i></i><i></i><i></i></span>External</div>
+      <div class="mini__body">
+        <div class="mini__row"><span>Process</span><span>Separate</span></div>
+        <div class="mini__row"><span>Injected</span><span>Nothing</span></div>
+        <div class="mini__row"><span>Overlay</span><span class="on">144 fps</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <section class="work work--external">
+    <div class="tabs">
+      <span class="tab is-on">Overlay preview</span>
+      <span class="sp"></span>
+      <div class="acts">
+        <span class="sel"><i></i><i></i><i></i><i></i><button class="act act--run" type="button">Start overlay</button></span>
+        <button class="act" type="button">Stop</button>
+      </div>
+    </div>
+    <div class="preview">
+      <i class="reg" aria-hidden="true"></i>
+      <div class="hud"><i></i>log External · 144 fps</div>
+      <svg class="scene" viewBox="0 0 640 512" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g class="g">
+          <path d="M0 214H640"/>
+          <path d="M0 226H640M0 242H640M0 264H640M0 294H640M0 336H640M0 394H640M0 474H640"/>
+          <path d="M320 214L-420 512M320 214L-170 512M320 214L40 512M320 214L210 512M320 214L320 512M320 214L430 512M320 214L600 512M320 214L810 512M320 214L1060 512"/>
+        </g>
+        <g class="b">
+          <path d="M70 330V250L150 232V312Z M150 232L196 246V326L150 312 M70 250L116 264H196 M116 264V344L70 330 M116 344H196V326"/>
+          <path d="M468 300V190L566 170V280Z M566 170L612 184V294L566 280 M468 190L514 204H612 M514 204V314L468 300 M514 314H612V294"/>
+          <path d="M262 218V176H330V218 M330 176L352 182V222 M262 176L284 170H352"/>
+          <path d="M0 150H40V214 M40 150L64 140V206"/>
+        </g>
+        <g>
+          <rect class="esp" x="226" y="252" width="52" height="96"/>
+          <rect class="hp" x="218" y="270" width="3" height="78"/>
+          <text x="226" y="240">mintfox · 61</text>
+          <rect class="esp esp--on" x="368" y="270" width="68" height="128"/>
+          <rect class="hp hp--on" x="358" y="300" width="4" height="98"/>
+          <text class="t--on" x="368" y="258">kestrel_09 · 38</text>
+          <rect class="esp" x="482" y="214" width="30" height="58"/>
+          <rect class="hp" x="476" y="224" width="2" height="48"/>
+          <text x="456" y="202">orbit · 114</text>
+          <path class="esp esp--on" d="M320 512L402 398"/>
+        </g>
+      </svg>
+    </div>
+    <footer class="statusbar">
+      <span>3 players drawn</span><span>Draw limit 300 studs</span>
+      <span class="sp"></span>
+      <span class="live"><i></i>Reading Roblox · window 1</span>
+    </footer>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
