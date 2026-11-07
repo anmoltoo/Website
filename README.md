@@ -15,6 +15,13 @@ only the kit files the page loads. Serve the folder over http (the scripts are E
 python3 -m http.server 8000      # then open http://localhost:8000
 ```
 
+## Live site (GitHub Pages)
+
+`.github/workflows/pages.yml` publishes `index.html` and `assets/` to
+https://anmoltoo.github.io/Website/ on every push to the default branch that touches the site, or by
+hand from the Actions tab (Deploy site to GitHub Pages, Run workflow). It needs Pages switched on once:
+Settings, Pages, Build and deployment, Source: GitHub Actions.
+
 ## Desktop app (design only)
 
 `app/` is an Electron window that draws the executor as the website shows it: the script list, the
