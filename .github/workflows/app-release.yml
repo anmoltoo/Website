@@ -1,0 +1,42 @@
+# Builds the log desktop window (app/, design only) into a Windows installer and attaches it to a GitHub
+# Release named app-v<version>, so the website's Free download can link to releases/latest. Run it by hand
+# from the Actions tab, or push a tag such as app-v0.1.0. Bump "version" in app/package.json for a new release.
+name: Build the log app installer
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['app-v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npx electron-builder --win --publish never
+      - name: Publish the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          tag="app-v$version"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/log-setup.exe --clobber
+          else
+            gh release create "$tag" dist/log-setup.exe --target "$GITHUB_SHA" \
+              --title "log $version (design preview)" \
+              --notes "The log window as the website shows it: the script list, the editor and console, and the External view. Design only: it does not attach to Roblox or run scripts. Windows 10 and 11, 64-bit. The installer is not code-signed, so Windows SmartScreen asks before it runs (More info, Run anyway)."
+          fi

@@ -3,6 +3,8 @@
   "productName": "log",
   "version": "0.1.0",
   "description": "Design-only desktop window of the log executor: the layout and look, no features.",
+  "author": "log",
+  "repository": "github:anmoltoo/Website",
   "main": "main.js",
   "private": true,
   "license": "UNLICENSED",
@@ -33,7 +35,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "log-setup.exe"
     }
   }
 }

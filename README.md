@@ -29,9 +29,16 @@ editor with its console, the status bar, and an External view with the overlay s
 preview. Nothing in it attaches to Roblox, runs, opens or saves anything; only the window dots and the
 Executor / External switch respond. See `app/README.md`.
 
+`.github/workflows/app-release.yml` builds it into `log-setup.exe` on a Windows runner and attaches it
+to a GitHub Release named `app-v<version>` (from `app/package.json`). Run it from the Actions tab
+(Build the log app installer, Run workflow) or push a tag such as `app-v0.1.0`. The site's Free
+download links to `releases/latest/download/log-setup.exe`, so it always serves the newest release.
+The installer is not code-signed, so Windows SmartScreen asks before it runs.
+
 ## Before going live
 
-- `downloads/log-setup.exe`: the Free plan's download link points here; add the real installer.
+- The Free plan's download serves the design-only window from the latest release; replace it with
+  the real installer when there is one (a release with a higher version and a `log-setup.exe` asset).
 - Prices ($0 and $6.49 a month), the version number (3.2.1), the 24-hour key, the 4-window Pro limit
   and the 144 fps overlay figure are placeholders to replace with the real ones.
 - `sales@log.example` and `help@log.example` are placeholder addresses.
